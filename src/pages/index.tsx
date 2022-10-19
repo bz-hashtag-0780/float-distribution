@@ -7,6 +7,7 @@ import batch from '../data/batch';
 import { useMemo, useState } from 'react'
 import {HAS_FLOAT_COLLECTION} from '../cadence/scripts/script.has-float-collection'
 import Table, { TableStyles } from '../components/Table';
+import { TOTAL_SUPPLY } from '../cadence/scripts/script.total-supply-flow';
 
 fcl
   .config()
@@ -15,6 +16,7 @@ fcl
 
 const Home: NextPage = () => {
 	const [mappedBatch, setMappedBatch] = useState();
+	const [totalSupply, setTotalSupply] = useState(0);
 
   const batchColumns = useMemo(
 		() => [
@@ -38,6 +40,18 @@ const Home: NextPage = () => {
   function handleClick() {
     navigator.clipboard.writeText(JSON.stringify(mappedBatch, null, 2))
   }
+
+  const getTotalSupply = async () => {
+	try {
+		let response = await query({
+			cadence: TOTAL_SUPPLY
+		});
+		setTotalSupply(response);
+		console.log("total supply"+response)
+	} catch (err) {
+		console.log(err);
+	}
+  } 
 
   const hasCollection = async (address: any) => {
 		try {
@@ -79,6 +93,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <h1>stuff</h1>
+		<button onClick={()=>getTotalSupply()}>total supply</button>
         <button onClick={()=>mapBatch()}>check batch</button>
         <button onClick={()=>handleClick()}>Copy</button>
         {mappedBatch != null ? (
